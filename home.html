@@ -1,0 +1,137 @@
+{% extends 'weblog/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="col-sm-3">
+    <div class="well2" style="margin-bottom:20px;">
+        <div class="panel-heading2">
+            <h4 style="margin-left: 19px; text-transform: capitalize;">{{ user.first_name }}'s groups</h4>
+        </div>
+        <div class="well">
+            <ul class="list-unstyled">
+                <li style="padding-bottom: 8px;"><a href="http://www.example.com">Create a group</a></li>
+                <li style="font-size: 12px;"><a href="http://www.example.com">Your group1</a></li>
+                <li style="font-size: 12px;"><a href="http://www.example.com">Your group2</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="well2" style="margin-bottom:20px;">
+        <div class="panel-heading2">
+            <h4 style="margin-left: 19px; text-transform: capitalize;">Connected with</h4>
+        </div>
+        <div class="well">
+            <ul class="list-unstyled">
+                {% for friend in friends_list %}
+                <li style="font-size: 12px;"><a href="{% url 'user-posts' friend.email %}">{{ friend.first_name }} {{ friend.last_name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="well" style="margin-bottom:20px">
+        <h4 style="font-size: 14px" class="text-left">LauncH © 2021</h4>
+        <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">About</a>
+        <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">Privacy</a>
+        <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">Terms</a>
+    </div>
+</div>
+
+<div class="col-sm-5">
+    <div class="well2" style="margin-bottom:20px">
+        <div class="panel-heading2">
+            <h4 style="margin-left: 19px;">Start a new post</h4>
+        </div>
+        <div class="well">
+            <form class="form-horizontal" method="POST">
+                {% csrf_token %}
+                <div class="form-group2">
+                    {{ form.as_p }}
+                </div>
+                <button class="btn btn-primary pull-right" type="submit">Post</button>
+                <ul class="list-inline">
+                    <li><a href=""><i class="glyphicon glyphicon-camera"></i></a></li>
+                    <li><a href=""><i class="glyphicon glyphicon-map-marker"></i></a></li>
+                </ul>
+            </form>
+        </div>
+    </div>
+
+    <div class="well2" style="margin-bottom:20px">
+        <div class="panel-heading2">
+            <h4 style="margin-left: 19px;">Search posts</h4>
+        </div>
+        <div class="well">
+            <form class="form-horizontal" role="form" style="padding-bottom: 0px;">
+                <textarea class="form-control3" placeholder="With all the words"></textarea>
+                <textarea class="form-control3" placeholder="With none of the words"></textarea>
+                <textarea class="form-control3" placeholder="Location"></textarea>
+                <textarea class="form-control3" placeholder="Subject"></textarea>
+                <div class="form-group2" style="padding-right: 28px; padding-left: 14px; padding-bottom: 0px; padding-top: 0px;">
+                    <button class="btn btn-primary pull-right" type="button"><i class="glyphicon glyphicon-search" style="font-size:14px;"></i></button>
+                    <select style="display: table-row;">
+                        <option value="none">Purpose</option>
+                        <option value="volvo">Looking for co-founder</option>
+                        <option value="volvo">Looking for people to join us</option>
+                        <option value="saab">Seeking funding</option>
+                        <option value="opel">I am a funder</option>
+                        <option value="opel">Get comments on my ideas</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% for post in posts %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                <li style="font-size: 13px; text-transform: capitalize;">
+                    <a href="{% url 'user-posts' post.author.email %}">{{ post.author.first_name|first }}.{{ post.author.last_name }}</a> | {{ post.time }} | {{ post.location }}
+                </li>
+                <li style="font-size: 12px;">Subject: {{ post.subject }} | Purpose: {{ post.purpose }}</li>
+            </ul>
+            <p style="text-align: justify; text-justify: inter-word;">{{ post.content }} <a>...see more</a></p>
+            <div>
+                {% for comment in comments %}
+                {% if comment.post == post %}
+                <div id="cmm">
+                    <ul class="list-unstyled">
+                        <li style="font-size: 20px;">
+                            <a href="{% url 'user-posts' comment.author.email %}" style="color:blue;">{{ comment.author.last_name }}:</a>
+                            {{ comment.content }}
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <form method="POST" class="comment-form" id="cccform" action=".">
+            {% csrf_token %}
+            {{ ComForm.as_p }}
+            <button class="btn btn-primary pull-right" style="display:inline-flex" type="submit" id="sub">Comment</button>
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+$(document).on('submit', '.comment-form', function(event) {
+    event.preventDefault();
+    function resetForm() { document.getElementById("cccform").reset(); }
+    $.ajax({
+        type: 'POST',
+        url: '/',
+        data: $("#cccform").serialize(),
+        success: function(response) {
+            resetForm();
+        }
+    });
+});
+</script>
+
+{% endblock content %}
