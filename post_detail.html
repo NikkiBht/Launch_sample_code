@@ -1,0 +1,65 @@
+{% extends 'weblog/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="col-sm-3">
+        <div class="well2" style="margin-bottom: 20px;">
+            <div class="panel-heading2">
+                <h4 style="margin-left: 19px; text-transform: capitalize;">{{ user.first_name }}'s groups</h4>
+            </div>
+            <div class="well">
+                <ul class="list-unstyled">
+                    <li style="padding-bottom: 8px;"><a href="http://www.example.com">Create a group</a></li>
+                    <li style="font-size: 12px;"><a href="http://www.example.com">Your group1</a></li>
+                    <li style="font-size: 12px;"><a href="http://www.example.com">Your group2</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="well" style="margin-bottom: 20px;">
+            <h4 style="font-size: 14px" class="text-left">
+                LauncH © 2021
+            </h4>
+            <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">About</a>
+            <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">Privacy</a>
+            <a href="#" class="text-left" style="font-size: 11px; padding-right: 8px;">Terms</a>
+        </div>
+    </div>
+
+    <div class="col-sm-5">
+        <div class="well2" style="margin-bottom: 20px;">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        <li style="font-size: 13px; text-transform: capitalize;">
+                            <a href="#">{{ object.author.first_name|first }}.{{ object.author.last_name }}</a>
+                            | {{ object.time }} | {{ object.location }}
+                        </li>
+                        <li style="font-size: 12px;">Subject: {{ object.subject }} | Purpose: {{ object.purpose }}</li>
+                    </ul>
+                    <p style="text-align: justify; text-justify: inter-word;">{{ object.content }}
+                        <a>...see more</a>
+                    </p>
+                    <form method="post">
+                        <button class="btn btn-primary pull-right" style="display: flex;" type="submit">Comment</button>
+                        {% csrf_token %}
+                        {{ ComForm }}
+                    </form>
+                    <div>
+                        {% for y in comments %}
+                            {% if y.post == object %}
+                                <div>
+                                    <ul class="list-unstyled">
+                                        <li style="font-size: 20px;">
+                                            <a href="#" style="color: blue;">{{ y.author.last_name }}:</a>
+                                            {{ y.content }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
